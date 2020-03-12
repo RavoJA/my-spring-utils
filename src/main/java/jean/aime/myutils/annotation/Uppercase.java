@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface FirstUpperCase {
-    String value() default "";
+public @interface Uppercase {
+    String target() ;
 }

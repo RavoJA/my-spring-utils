@@ -11,17 +11,17 @@ import java.util.Date;
  * @since java 1.8
  */
 
-public interface GeneralService {
+public final class GeneralService {
 
-    String EN_DATE_FORMAT = "yyyy/MM/dd";
-    String FR_DATE_FORMAT = "dd/MM/yyyy";
-    String DATE_FORMAT = "MMMM/yyyy";
+    static String EN_DATE_FORMAT = "yyyy/MM/dd";
+    static String FR_DATE_FORMAT = "dd/MM/yyyy";
+    static String DATE_FORMAT = "MMMM/yyyy";
 
     /**
      * @param pDateString date au format String et en format Francais
      * @return une instqnce de date suivant une daste String en parametre
      */
-    static Date changeDateFrToEn(String pDateString) throws Exception {
+    public static Date changeDateFrToEn(String pDateString) throws Exception {
         Date date;
         try {
             SimpleDateFormat dt = new SimpleDateFormat(FR_DATE_FORMAT);
@@ -41,7 +41,7 @@ public interface GeneralService {
      * @param pDateEng date au format par defaut
      * @return un String representant un date qui correspond a la date envoye en parametre
      */
-    static String changeEnTofr(Date pDateEng) throws Exception {
+    public static String changeEnTofr(Date pDateEng) throws Exception {
         String date;
         try {
             SimpleDateFormat dt = new SimpleDateFormat(FR_DATE_FORMAT);
@@ -59,7 +59,7 @@ public interface GeneralService {
      * @param pDateNaissance la date de naissance de la personne
      * @return l'age correspondant
      */
-    static Integer getAgeFromDateNaissance(LocalDate pDateNaissance) throws Exception {
+    public static Integer getAgeFromDateNaissance(LocalDate pDateNaissance) throws Exception {
         int currentYear = LocalDate.now().getYear();
         int dateNaissYear = pDateNaissance.getYear();
         int current;
@@ -80,7 +80,7 @@ public interface GeneralService {
      * @return verifier la difference entre les deux dates entree est superieur à 17
      * @throws Exception une exception est lancé si la conversion de la date echoue
      */
-    static Integer checkDateDelivranceFromDateNaissance(LocalDate pDateNaissance, LocalDate pDateDelivrance) throws Exception {
+    public static Integer checkDateDelivranceFromDateNaissance(LocalDate pDateNaissance, LocalDate pDateDelivrance) throws Exception {
         int dateDeliv = pDateDelivrance.getYear();
         int dateNaissYear = pDateNaissance.getYear();
         int age;
@@ -96,7 +96,7 @@ public interface GeneralService {
      * @param totalPage valeur de la page au total en entier
      * @return un tableau des pages
      */
-    static int[] nbPages(int totalPage) {
+    public static int[] nbPages(int totalPage) {
         int[] nb_page = new int[totalPage];
         for (int i = 0; i < nb_page.length; i++) {
             nb_page[i] = i + 1;
@@ -108,7 +108,7 @@ public interface GeneralService {
      * @param page le numero de la page courante
      * @return valeur de la page courante
      */
-    static int pageCourante(int page) {
+    public static int pageCourante(int page) {
         int p = page - 1;
         if (p <= 0) {
             p = 0;
@@ -123,7 +123,7 @@ public interface GeneralService {
      * @param pMinute la valeur de la minute
      * @return une valeur en format string d'une heure provenant d'une valeur entier de la minute
      */
-    static String convertMinuteToHiur(Integer pMinute) {
+    public static String convertMinuteToHiur(Integer pMinute) {
         int h = pMinute / 60;
         int min = pMinute % 60;
         return h + ":" + min;
@@ -137,7 +137,7 @@ public interface GeneralService {
      * @return String valeur retourne
      */
 
-    static String genereateSequentiel(String nombre) {
+    public static String genereateSequentiel(String nombre) {
         String output;
         System.out.println("eto nyu valeurt " + nombre + " lengt ");
         switch (nombre.length()) {
@@ -165,7 +165,7 @@ public interface GeneralService {
      * @param separator string date sperator, possible value (- or /)
      */
 
-    static LocalDate stringDateToLocaldate(String sDate, char separator) {
+    public static LocalDate stringDateToLocaldate(String sDate, char separator) {
         // PATTERN IS THE FORMAT OF sDate
         LocalDate localDate;
         try {
@@ -190,7 +190,7 @@ public interface GeneralService {
      * @param separator string date sperator, possible value (- or /)
      */
 
-    static LocalDate stringDateToLocaldateEN(String sDate, char separator) {
+    public static LocalDate stringDateToLocaldateEN(String sDate, char separator) {
         // PATTERN IS THE FORMAT OF sDate
         LocalDate localDate;
         try {
@@ -209,7 +209,7 @@ public interface GeneralService {
     /**
      * Convert an english date format to string date format
      */
-    static String localDateToStringDate(LocalDate localDate, char separator) {
+    public static String localDateToStringDate(LocalDate localDate, char separator) {
         String date;
         try {
             date = localDate.format(setFormarFR(separator));
@@ -223,7 +223,7 @@ public interface GeneralService {
     /**
      * Convert an english date format to string date format
      */
-    static String localDateToStringDateEN(LocalDate localDate, char separator) {
+    public static String localDateToStringDateEN(LocalDate localDate, char separator) {
         String date;
         try {
             date = localDate.format(setFormarEN(separator));
@@ -237,7 +237,7 @@ public interface GeneralService {
     /**
      * Change format of date from String date
      */
-    static DateTimeFormatter setFormarFR(char separator) {
+    public static DateTimeFormatter setFormarFR(char separator) {
         String format = "dd/MM/yyyy";
         if (separator == '/' || separator == '-') {
             format = "dd" + separator + "MM" + separator + "yyyy";
@@ -248,7 +248,7 @@ public interface GeneralService {
     /**
      * Change format of date from String date
      */
-    static DateTimeFormatter setFormarEN(char separator) {
+    public static DateTimeFormatter setFormarEN(char separator) {
         String format = "MM/dd/yyyy";
         if (separator == '/' || separator == '-') {
             format = "MM" + separator + "dd" + separator + "yyyy";
@@ -256,11 +256,11 @@ public interface GeneralService {
         return DateTimeFormatter.ofPattern(format);
     }
 
-    static LocalDate dateToLocalDate(Date date) {
+    public static LocalDate dateToLocalDate(Date date) {
         return new java.sql.Date(date.getTime()).toLocalDate();
     }
 
-    static Date localDateToDate(LocalDate localDate) {
+    public static Date localDateToDate(LocalDate localDate) {
         return java.sql.Date.valueOf(localDate);
     }
 
