@@ -18,7 +18,7 @@ import java.util.Optional;
  * @param <E>  the entity type
  * @param <SC> the searchCriteria type
  */
-public interface  MySearchCriteriaService<E extends AbstractEntity<ID>, ID extends Serializable,
+public interface SearchCriteriaService<E extends AbstractEntity<ID>, ID extends Serializable,
         SC extends AbstractCriteria<ID>> {
 
     /**

@@ -17,7 +17,7 @@ import java.util.Optional;
  * @param <SC> the search criteria type
  * @author Jean Aimé R.
  */
-public interface MyQueryDSLRepository<E extends AbstractEntity<ID>, ID extends Serializable,
+public interface QueryDSLRepository<E extends AbstractEntity<ID>, ID extends Serializable,
         SC extends AbstractCriteria<ID>> {
 
     /**

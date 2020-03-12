@@ -1,8 +1,11 @@
 package jean.aime.myutils.services;
 
-import jean.aime.myutils.annotation.FirstUpperCaseService;
+
+
+import jean.aime.myutils.annotation.AnnotationServiceImpl;
 import jean.aime.myutils.core.AbstractCriteria;
-import jean.aime.myutils.dba.querydsl.MyQueryDSLRepository;
+import jean.aime.myutils.core.GeneratorUtils;
+import jean.aime.myutils.dba.querydsl.QueryDSLRepository;
 import jean.aime.myutils.domain.AbstractEntity;
 import jean.aime.myutils.errorhandler.AppResponseEntityException;
 import lombok.extern.slf4j.Slf4j;
@@ -28,20 +31,21 @@ import java.util.Optional;
 @Transactional
 @Slf4j
 @Service
-public abstract class AbstractMySearchCriteriaServiceImpl<E extends AbstractEntity<ID>, ID extends Serializable,
+public abstract class AbstractSearchCriteriaServiceImpl<E extends AbstractEntity<ID>, ID extends Serializable,
         RP extends JpaRepository<E, ID>, SC extends AbstractCriteria<ID>>
-        implements MySearchCriteriaService<E, ID, SC> {
+        implements SearchCriteriaService<E, ID, SC> {
 
     /**
      * the managed entity name
      */
     private final String targetEntity;
 
-    private final FirstUpperCaseService firstUpperCaseService;
+    private final AnnotationServiceImpl annotationServiceImpl;
 
-    public AbstractMySearchCriteriaServiceImpl(String targetEntity, FirstUpperCaseService firstUpperCaseService) {
+
+    public AbstractSearchCriteriaServiceImpl(String targetEntity, AnnotationServiceImpl annotationServiceImpl) {
         this.targetEntity = targetEntity;
-        this.firstUpperCaseService = firstUpperCaseService;
+        this.annotationServiceImpl = annotationServiceImpl;
     }
 
     /**
@@ -51,54 +55,85 @@ public abstract class AbstractMySearchCriteriaServiceImpl<E extends AbstractEnti
 
     @Override
     public Optional<E> fetchOneByCriteria(SC searchCriteria) {
-        MyQueryDSLRepository repo = (MyQueryDSLRepository) repository();
+        QueryDSLRepository repo = (QueryDSLRepository) repository();
         log.info("[Fecthing by criteria], getting one {} ", targetEntity);
         return repo.fetchOne(searchCriteria);
     }
 
     @Override
     public List<E> fetchAllByAndCriteria(SC searchCriteria) {
-        MyQueryDSLRepository repo = (MyQueryDSLRepository) repository();
+        QueryDSLRepository repo = (QueryDSLRepository) repository();
         log.info("[Fecthing by criteria] getting all {}", targetEntity);
         return repo.findAll(searchCriteria);
     }
 
     @Override
     public List<SC> fetchAllByCriteriaToDto(SC searchCriteria) {
-        MyQueryDSLRepository repo = (MyQueryDSLRepository) repository();
+        QueryDSLRepository repo = (QueryDSLRepository) repository();
         log.info("[Fecthing by criteria] getting all to dto {}", targetEntity);
         return repo.findAllDTo(searchCriteria);
     }
 
     @Override
     public Page<E> findAll(SC searchCriteria, Pageable pageable) {
-        MyQueryDSLRepository repo = (MyQueryDSLRepository) repository();
+        QueryDSLRepository repo = (QueryDSLRepository) repository();
         log.info("[Fecthing by criteria] getting all by page {} ", targetEntity);
         return repo.findAll(searchCriteria, pageable);
     }
 
     @Override
     public Page<SC> findAllByCriteriaByPageToDto(SC searchCriteria, Pageable pageable) {
-        MyQueryDSLRepository repo = (MyQueryDSLRepository) repository();
+        QueryDSLRepository repo = (QueryDSLRepository) repository();
         log.info("[Fecthing by criteria] getting all by page to DTO {} ", targetEntity);
         return repo.findAllDtoByPage(searchCriteria, pageable);
     }
 
     @Override
     public Long count(SC searchCriteria) {
-        MyQueryDSLRepository repo = (MyQueryDSLRepository) repository();
+        QueryDSLRepository repo = (QueryDSLRepository) repository();
         log.info("[Fecthing by criteria] count record {} ", targetEntity);
         return repo.count(searchCriteria);
     }
 
     @Override
     public E saveRecord(E entity) throws AppResponseEntityException, IllegalAccessException {
-        log.info("[Validating] data of {} ", targetEntity);
+
+        try {
+            annotationServiceImpl.makeUpperCase(entity, entity.getClass());
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        log.info("[Validating] data of {} ", entity);
         E entityValidate = validate(entity);
-        log.info("[Ckecking] if the entity has an attributes  to be FirstUpperCase {} ", targetEntity);
-        firstUpperCaseService.setFirstUpperCase(entity, entity.getClass());
-        log.info("[About to save] new record of {} ", targetEntity);
-        return repository().save(entityValidate);
+
+        log.info("[Ckeking unique value] ");
+
+        List<E> uniqueChecks = annotationServiceImpl.checkUniqValue(entity, entity.getClass());
+
+        if (entity.getId() != null && !entity.getId().toString().isEmpty()) {
+            if (!uniqueChecks.isEmpty()) {
+                if (entity.getId().equals(uniqueChecks.get(0).getId())) {
+                    log.info("[Updating]  {} ", targetEntity);
+                    return repository().save(entityValidate);
+                } else {
+                    throw new AppResponseEntityException("Duplicated record");
+                }
+            } else {
+                log.info("[Updating]  {} ", targetEntity);
+                return repository().save(entityValidate);
+            }
+        } else {
+            if (!uniqueChecks.isEmpty())
+                throw new AppResponseEntityException("Duplicated record");
+            if (entity.getId() instanceof String) {
+                entity.setId((ID) GeneratorUtils.uuid());
+            } else {
+                entity.setId((ID) GeneratorUtils.longUuid());
+            }
+            log.info("[Saving] new {} ", targetEntity);
+            return repository().save(entityValidate);
+        }
     }
 
     @Override
@@ -124,6 +159,7 @@ public abstract class AbstractMySearchCriteriaServiceImpl<E extends AbstractEnti
         if (!softDelete) {
             log.info("[Deleting record ] physically {} with ID {} ", targetEntity, id);
             repository().deleteById(id);
+            repository().flush();
         } else {
             E entity = fetchOneRecordById(id);
             log.info("[Deleting record ], executing soft delete {} with ID {} ", targetEntity, id);
@@ -132,4 +168,5 @@ public abstract class AbstractMySearchCriteriaServiceImpl<E extends AbstractEnti
         }
         return id;
     }
+
 }

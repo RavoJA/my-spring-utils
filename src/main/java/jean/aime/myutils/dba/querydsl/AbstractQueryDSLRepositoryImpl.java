@@ -22,11 +22,11 @@ import java.util.Optional;
  * @author Jean Aimé
  **/
 @Repository
-public abstract class AbstractMyQueryDSLRepositoryImpl<E extends AbstractEntity<ID>,
+public abstract class AbstractQueryDSLRepositoryImpl<E extends AbstractEntity<ID>,
         ID extends Serializable, SC extends AbstractCriteria<ID>>
-        extends QuerydslRepositorySupport implements MyQueryDSLRepository<E, ID, SC> {
+        extends QuerydslRepositorySupport implements QueryDSLRepository<E, ID, SC> {
 
-    public AbstractMyQueryDSLRepositoryImpl(Class<?> domainClass) {
+    public AbstractQueryDSLRepositoryImpl(Class<?> domainClass) {
         super(domainClass);
     }
 
