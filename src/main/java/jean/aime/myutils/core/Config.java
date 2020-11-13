@@ -1,7 +1,7 @@
 package jean.aime.myutils.core;
 
 
-import com.mdg.it.annotation.AnnotationServiceImpl;
+import jean.aime.myutils.annotation.AnnotationServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

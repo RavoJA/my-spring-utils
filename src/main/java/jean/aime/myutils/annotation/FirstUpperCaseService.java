@@ -13,7 +13,7 @@ public class FirstUpperCaseService {
     public <T> void setFirstUpperCase(T targetString, Class<?> aClass) throws IllegalAccessException {
         for (Field field : aClass.getDeclaredFields()) {
             field.setAccessible(true);
-            if (field.isAnnotationPresent(FirstUpperCase.class)) {
+            if (field.isAnnotationPresent(FirstUppercase.class)) {
                 if (field.getType().equals(String.class)) {
                     String fieldValue = (String) field.get(targetString);
                     String result = fieldValue.substring(0, 1).toUpperCase() + fieldValue.substring(1).toLowerCase();
